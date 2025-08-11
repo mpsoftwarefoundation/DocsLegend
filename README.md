@@ -8,6 +8,6 @@ Generate entire documentation sites all in one file
 
 <page title = "Introduction" path = "/">
 # This is the markdown of the page
-Creating documentation can be hard, but with DocsLegend, its a peice of cake!
+Creating documentation can be hard, but with DocsLegend, its a piece of cake!
 <end>
 ```
