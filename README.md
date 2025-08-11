@@ -1,3 +1,5 @@
+<img src="resources/icons/docs_legend_icon.svg" width="125">
+
 # DocsLegend
 Generate entire documentation sites all in one file
 
