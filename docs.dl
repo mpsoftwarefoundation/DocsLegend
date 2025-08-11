@@ -1,0 +1,13 @@
+# Documentation of DocsLegend, made in DocsLegend
+
+page {
+    name: "Introduction"
+    path: "/"
+    contents: ""
+
+    page {
+        name: "Getting Started"
+        path: "/getting-started"
+        contents: ""
+    }
+}

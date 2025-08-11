@@ -1,0 +1,35 @@
+:root {
+    color-scheme: light dark;
+    --bg-color: light-dark(BG_COLOR_LIGHT, BG_COLOR_DARK);
+    --fg-color: light-dark(FG_COLOR_LIGHT, FG_COLOR_DARK);
+    --link-color: light-dark(LINK_COLOR_LIGHT, LINK_COLOR_DARK);
+    --border-color: light-dark(BORDER_COLOR_LIGHT, BORDER_COLOR_DARK);
+    --item-selected-color: light-dark(
+        SELECTION_COLOR_LIGHT,
+        SELECTION_COLOR_DARK
+    );
+    --font: "Roboto", sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-color);
+}
+
+#container {
+    display: flex;
+    gap: 20px;
+}
+
+#page_navigation,
+#page_content {
+    padding: 20px;
+}
+
+a {
+    color: var(--link-color);
+}
