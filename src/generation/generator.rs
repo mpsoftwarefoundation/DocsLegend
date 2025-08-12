@@ -16,7 +16,6 @@ impl Generator {
         };
 
         let _ = fs::create_dir_all(&output_dir);
-        let _ = fs::create_dir_all(&output_dir.join("public"));
         let _ = fs::write(
             &output_dir.join("style.css"),
             include_str!("../../templates/style.css"),
@@ -50,7 +49,7 @@ impl Generator {
         }
     }
 
-    pub fn build_navigation(&mut self, page: &Page) {
+    pub fn build_navigation(&mut self, page: &Page, level: usize) {
         for page in &page.subpages {
             let href = if page.path == "/" {
                 "/"
@@ -58,17 +57,27 @@ impl Generator {
                 &format!("{}/", page.path.trim_end_matches('/'))
             };
 
-            self.navigation_html
-                .push_str(&format!("<a href=\"{}\">{}</a><br>", href, &page.name));
+            self.navigation_html.push_str(&format!(
+                "<a href=\"{}\">{}{}</a><br>",
+                href,
+                "· ".repeat(level),
+                &page.name
+            ));
 
-            self.build_navigation(page);
+            self.build_navigation(page, level + 1);
         }
     }
 
     fn render_page(&self, page: &Page) -> String {
         let page_html = include_str!("../../templates/page.html");
+        let page_markdown = page.markdown_contents.clone();
+        let page_markdown = page_markdown
+            .lines()
+            .map(|line| line.trim_start())
+            .collect::<Vec<_>>()
+            .join("\n");
 
-        let parser = pulldown_cmark::Parser::new(&page.markdown_contents);
+        let parser = pulldown_cmark::Parser::new(&page_markdown);
         let mut html_output = String::new();
 
         pulldown_cmark::html::push_html(&mut html_output, parser);

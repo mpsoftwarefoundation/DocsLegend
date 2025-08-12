@@ -25,7 +25,7 @@ pub fn generate_site(filename: &str, output_dir: &str, code: &str) -> Result<(),
     let parsed_page = parsed.page.as_ref().unwrap().clone();
 
     let mut generator = Generator::new(output_dir);
-    generator.build_navigation(&parsed_page);
+    generator.build_navigation(&parsed_page, 0);
     generator.generate(&parsed_page);
 
     Ok(())

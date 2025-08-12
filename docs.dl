@@ -4,19 +4,22 @@ page {
     name: "Introduction"
     path: "/"
     contents: "
-# DocsLegend
-DocsLegend is an all-in-one tool for generating complete documentation sites
+    # DocsLegend
     "
 
     page {
         name: "Getting Started"
         path: "/getting-started"
-        contents: ""
+        contents: "
+        # Getting Started
+        "
     }
 }
 
 page {
     name: "Usage"
     path: "/usage"
-    contents: ""
+    contents: "
+    # Using DocsLegend
+    "
 }
