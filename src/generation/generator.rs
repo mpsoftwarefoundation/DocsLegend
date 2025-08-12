@@ -29,29 +29,22 @@ impl Generator {
         for page in &root_page.subpages {
             if !page.path.starts_with("/") {
                 println!("The path of a page must start with a slash '/'");
-
                 return;
             }
 
             if page.path == "/" {
-                fs::write(
-                    self.output_dir.clone().join("index.html"),
-                    self.render_page(&page),
-                )
-                .expect("Error");
+                fs::write(self.output_dir.join("index.html"), self.render_page(&page))
+                    .expect("Error writing root index.html");
 
                 self.generate(&page);
-
                 continue;
             }
 
-            fs::write(
-                self.output_dir
-                    .clone()
-                    .join(&format!("public{}.html", page.path)),
-                self.render_page(&page),
-            )
-            .expect("Error");
+            let page_dir = self.output_dir.join(&page.path.trim_start_matches('/'));
+            fs::create_dir_all(&page_dir).expect("Error creating page directory");
+
+            fs::write(page_dir.join("index.html"), self.render_page(&page))
+                .expect("Error writing page index.html");
 
             self.generate(&page);
         }
@@ -59,19 +52,14 @@ impl Generator {
 
     pub fn build_navigation(&mut self, page: &Page) {
         for page in &page.subpages {
-            let mut page_path = String::from("public");
-            page_path.push_str(&page.path);
-            page_path.push_str(".html");
+            let href = if page.path == "/" {
+                "/"
+            } else {
+                &format!("{}/", page.path.trim_end_matches('/'))
+            };
 
-            self.navigation_html.push_str(&format!(
-                "<a href=\"{}\">{}</a><br>",
-                if page.path == "/" {
-                    "/index.html"
-                } else {
-                    &page_path
-                },
-                &page.name
-            ));
+            self.navigation_html
+                .push_str(&format!("<a href=\"{}\">{}</a><br>", href, &page.name));
 
             self.build_navigation(page);
         }
