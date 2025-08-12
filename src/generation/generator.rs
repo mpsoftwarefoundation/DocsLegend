@@ -1,29 +1,93 @@
-use crate::{errors::standard_error::StandardError, parsing::page::Page};
-use std::{fs, path::Path};
+use crate::parsing::page::Page;
+use std::{fs, path::PathBuf};
 
 pub struct Generator {
-    pub output_dir: String,
+    pub output_dir: PathBuf,
+    pub navigation_html: String,
 }
 
 impl Generator {
     pub fn new(output_dir: &str) -> Self {
+        let output_dir = PathBuf::from(output_dir.to_owned());
+
         let generator = Self {
-            output_dir: output_dir.to_string(),
+            output_dir: output_dir.to_owned(),
+            navigation_html: String::new(),
         };
 
-        let output_dir = Path::new(&output_dir);
         let _ = fs::create_dir_all(&output_dir);
         let _ = fs::create_dir_all(&output_dir.join("public"));
+        let _ = fs::write(
+            &output_dir.join("style.css"),
+            include_str!("../../templates/style.css"),
+        );
 
         generator
     }
 
-    pub fn visit(&self, root_page: Page) -> Result<(), StandardError> {
-        let page_html =
-            fs::read_to_string("templates/page.html").expect("Error reading HTML template");
-        let primary_stylesheet =
-            fs::read_to_string("templates/style.css").expect("Error reading CSS template");
+    pub fn generate(&mut self, root_page: &Page) {
+        for page in &root_page.subpages {
+            if !page.path.starts_with("/") {
+                println!("The path of a page must start with a slash '/'");
 
-        Ok(())
+                return;
+            }
+
+            if page.path == "/" {
+                fs::write(
+                    self.output_dir.clone().join("index.html"),
+                    self.render_page(&page),
+                )
+                .expect("Error");
+
+                self.generate(&page);
+
+                continue;
+            }
+
+            fs::write(
+                self.output_dir
+                    .clone()
+                    .join(&format!("public{}.html", page.path)),
+                self.render_page(&page),
+            )
+            .expect("Error");
+
+            self.generate(&page);
+        }
+    }
+
+    pub fn build_navigation(&mut self, page: &Page) {
+        for page in &page.subpages {
+            let mut page_path = String::from("public");
+            page_path.push_str(&page.path);
+            page_path.push_str(".html");
+
+            self.navigation_html.push_str(&format!(
+                "<a href=\"{}\">{}</a><br>",
+                if page.path == "/" {
+                    "/index.html"
+                } else {
+                    &page_path
+                },
+                &page.name
+            ));
+
+            self.build_navigation(page);
+        }
+    }
+
+    fn render_page(&self, page: &Page) -> String {
+        let page_html = include_str!("../../templates/page.html");
+
+        let parser = pulldown_cmark::Parser::new(&page.markdown_contents);
+        let mut html_output = String::new();
+
+        pulldown_cmark::html::push_html(&mut html_output, parser);
+
+        page_html
+            .replace("PAGE_TITLE", &page.name)
+            .replace("PAGE_CONTENT", &html_output)
+            .replace("PAGE_NAVIGATION", &self.navigation_html)
     }
 }

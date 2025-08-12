@@ -22,8 +22,11 @@ pub fn generate_site(filename: &str, output_dir: &str, code: &str) -> Result<(),
         return Err(err);
     }
 
-    let generator = Generator::new(output_dir);
-    let _ = generator.visit(parsed.page.unwrap());
+    let parsed_page = parsed.page.as_ref().unwrap().clone();
+
+    let mut generator = Generator::new(output_dir);
+    generator.build_navigation(&parsed_page);
+    generator.generate(&parsed_page);
 
     Ok(())
 }

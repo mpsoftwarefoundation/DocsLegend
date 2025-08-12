@@ -1,12 +1,11 @@
-use std::fs;
-
 use clap::{Parser, Subcommand};
-use docs_legend::generate_site;
+use dl::generate_site;
+use std::fs;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Parser)]
-#[command(name = "docslegend", version = VERSION, about = "Generate documentation from input '.dl' files")]
+#[command(name = "dl", version = VERSION, about = "Generate documentation sites all from one file")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
